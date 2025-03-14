@@ -74,7 +74,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return exist;
     }
 
-    // To get the User Details
+    // To get the User Details.
     public Cursor  getUserInfo(String username){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT username, email FROM user WHERE username = ?", new String[]{username});
