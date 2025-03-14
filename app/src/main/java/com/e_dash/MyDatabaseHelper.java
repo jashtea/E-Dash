@@ -63,6 +63,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
+    // Check user existence
     public boolean checkUser(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " +
