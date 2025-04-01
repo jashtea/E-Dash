@@ -12,14 +12,15 @@ import androidx.fragment.app.FragmentTransaction;
 public class Home extends AppCompatActivity {
 
     private ImageView chart;
-    private ImageView profile;
+    private ImageView profile, addProduct;
     private FrameLayout fragmentContainer;
-    private ImageView analytics;
+    private ImageView analytics, monitor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
+
 
         chart = findViewById(R.id.analytics);
 //        fragmentContainer = findViewById(R.id.fragmentContainer);
@@ -32,31 +33,41 @@ public class Home extends AppCompatActivity {
             }
         });
 
-        analytics = findViewById(R.id.analytics);
-        analytics.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             startActivity(
-                                                     new Intent(Home.this, Login.class));
-                                         }
-                                     });
+//        analytics = findViewById(R.id.analytics);
+//        analytics.setOnClickListener(new View.OnClickListener() {
+//                                         @Override
+//                                         public void onClick(View v) {
+//                                             startActivity(
+//                                                     new Intent(Home.this, Login.class));
+//                                         }
+//                                     });
+
+
+        monitor = findViewById(R.id.monitor);
+
+        monitor.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               startActivity(
+                       new Intent(Home.this, Monitor_Sales.class));
+           }
+        });
 
 
 
-
-//        chart.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                loadChartFragment();
-//            }
-//        });
+        chart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadChartFragment();
+            }
+        });
 
     }
 
-//    private void loadChartFragment() {
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction transaction = fragmentManager.beginTransaction();
-//        transaction.replace(R.id.fragmentContainer, new ChartFragment());
-//        transaction.commit();
-//    }
+    private void loadChartFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragmentContainer, new ChartFragment());
+        transaction.commit();
+    }
 }
