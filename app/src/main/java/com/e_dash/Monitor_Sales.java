@@ -156,6 +156,7 @@ public class Monitor_Sales extends AppCompatActivity {
     private void getTableData() {
         TableLayout table = findViewById(R.id.monitor_sales);
         int rowCount = table.getChildCount();
+        
         MyDatabaseHelper dbHelper = new MyDatabaseHelper(this);
 
         // Start from 1 to skip the header row
@@ -166,6 +167,8 @@ public class Monitor_Sales extends AppCompatActivity {
             double price = Double.parseDouble(((TextView) row.getChildAt(1)).getText().toString().replace("Php", ""));
             int quantity = Integer.parseInt(((TextView) row.getChildAt(2)).getText().toString());
             int sold = Integer.parseInt(((TextView) row.getChildAt(3)).getText().toString());
+
+            String name = "Jusitne";
 
             // Insert data into the database
             dbHelper.insertSale(productName, price, quantity, sold);

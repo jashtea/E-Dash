@@ -53,7 +53,7 @@ public class ChartFragment extends Fragment {
 
             cursor.close();
         }
-        db.close();  // Ensure database connection is closed
+        db.close();
 
         if (entries.isEmpty()) {
             pieChart.setNoDataText("No sales data available");
