@@ -32,12 +32,8 @@ public class Profile extends AppCompatActivity {
         log_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Profile.this, Login.class));
 
-                // Finish all activity when user logout
-                finishAffinity();
-
-
+                logout();
             }
         });
 
@@ -62,8 +58,8 @@ public class Profile extends AppCompatActivity {
         Cursor cursor = myDatabaseHelper.getUserInfo(username);
 
         if(cursor.moveToFirst()){
-            String name = cursor.getString(cursor.getColumnIndex("username"));
-            String email = cursor.getString(cursor.getColumnIndex("email"));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+            String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
 
             user_name.setText(name);
             user_email.setText(email);
@@ -72,4 +68,15 @@ public class Profile extends AppCompatActivity {
         }
 
     }
+
+
+    public void logout(){
+        SharedPreferences sharedPreferences = getSharedPreferences("userSession", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+        finishAffinity();
+        startActivity(new Intent(Profile.this, Login.class));
+    }
+
 }

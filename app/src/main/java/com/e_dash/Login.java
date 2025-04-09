@@ -20,12 +20,22 @@ public class Login extends AppCompatActivity {
     private EditText userPass;
     private Button login;
     private TextView reg;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
+
+        sharedPreferences = getSharedPreferences("userSession", Context.MODE_PRIVATE);
+
+        // Check if already login
+        if(sharedPreferences.getBoolean("isLoggedIn", false)){
+            startActivity(new Intent(Login.this, Home.class));
+            finish();
+            return;
+        }
 
         login = findViewById(R.id.log_in);
 
@@ -53,9 +63,6 @@ public class Login extends AppCompatActivity {
 
         MyDatabaseHelper db = new MyDatabaseHelper(Login.this);
 
-        String admin = "admin";
-        String pass = "12345";
-
         userName = findViewById(R.id.username);
         userPass = findViewById(R.id.password);
         login = findViewById(R.id.log_in);
@@ -65,8 +72,8 @@ public class Login extends AppCompatActivity {
 
         if(db.checkUser(user_name, pass_word)) {
 
-            SharedPreferences sharedPreferences = getSharedPreferences("userSession", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isLoggedIn", true);
             editor.putString("username", user_name);
             editor.apply();
 
