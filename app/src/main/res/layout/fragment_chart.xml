@@ -6,6 +6,16 @@
     android:gravity="center"
     android:padding="16dp">
 
+    <!-- Dropdown Filter -->
+
+    <!-- Pie Chart -->
+
+    <Spinner
+        android:id="@+id/filterSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp" />
+
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pieChart"
         android:layout_width="match_parent"

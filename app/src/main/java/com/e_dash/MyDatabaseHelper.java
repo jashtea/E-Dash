@@ -6,11 +6,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     // Database elements
     private static final String DATABASE_NAME = "Edash.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     // User table
     private static final String TABLE_NAME = "user";
@@ -26,6 +30,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PRICE = "price";
     private static final String COLUMN_QUANTITY = "quantity";
     private static final String COLUMN_SOLD = "sold";
+
+    private static final String COLUMN_DATE = "date";
 
     // Constructor
     public MyDatabaseHelper(Context context) {
@@ -48,7 +54,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_PRODUCT_NAME + " TEXT, " +
                 COLUMN_PRICE + " REAL, " +
                 COLUMN_QUANTITY + " INTEGER, " +
-                COLUMN_SOLD + " INTEGER)";
+                COLUMN_SOLD + " INTEGER, " +
+                COLUMN_DATE + " TEXT)";
         db.execSQL(salesTableQuery);
 
         android.util.Log.d("DatabaseHelper", "Database created successfully");
@@ -105,30 +112,86 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_QUANTITY, quantity);
         values.put(COLUMN_SOLD, sold);
 
-        long result = db.insert(SALES_TABLE, null, values);
-        db.close();
+        // Get current date in format YYYY-MM-DD
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        values.put(COLUMN_DATE, currentDate); // add date to values
+
+        // Insert or update if product exists (use CONFLICT_REPLACE to avoid duplicates)
+        long result = db.insertWithOnConflict(SALES_TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+//        db.close();
         return result != -1;
     }
 
+
     //Update sales
-    public boolean updateSale(String productName, double price, int quantity, int sold){
+    public boolean updateSoldValue(String name, int sold) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-
-        values.put(COLUMN_PRODUCT_NAME, productName);
-        values.put(COLUMN_PRICE, price);
-        values.put(COLUMN_QUANTITY, quantity);
         values.put(COLUMN_SOLD, sold);
-
-        int rowsAffected = db.update(SALES_TABLE, values, COLUMN_PRODUCT_NAME + " =?", new String[]{productName});
+        int rowsAffected = db.update(SALES_TABLE, values, COLUMN_PRODUCT_NAME + " = ?", new String[]{name});
         db.close();
         return rowsAffected > 0;
     }
 
-    // Fetch Sales Data for PieChart
-    public Cursor getSalesData() {
+
+
+
+    public boolean productExists(String productName) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT " + COLUMN_PRODUCT_NAME + ", " + COLUMN_SOLD + " FROM " + SALES_TABLE, null);
-        return cursor;
+        String query = "SELECT * FROM " + SALES_TABLE + " WHERE LOWER(TRIM(" + COLUMN_PRODUCT_NAME + ")) = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{productName.trim().toLowerCase()});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
     }
+
+
+
+    // Fetch Sales Data for PieChart
+//    public Cursor getSalesData() {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT " + COLUMN_PRODUCT_NAME + ", " + COLUMN_SOLD + " FROM " + SALES_TABLE, null);
+//        return cursor;
+//    }
+
+    // Filter data for pie chart
+
+    public Cursor getSalesData(String filter) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query;
+
+        if (filter.equals("This Month")) {
+            query = "SELECT product_name, SUM(sold) FROM sales " +
+                    "WHERE strftime('%Y-%m', date) = strftime('%Y-%m', 'now') " +
+                    "GROUP BY product_name";
+        } else if (filter.equals("This Week")) {
+            query = "SELECT product_name, SUM(sold) FROM sales " +
+                    "WHERE strftime('%W', date) = strftime('%W', 'now') " +
+                    "AND strftime('%Y', date) = strftime('%Y', 'now') " +
+                    "GROUP BY product_name";
+        } else { // All Time
+            query = "SELECT product_name, SUM(sold) FROM sales GROUP BY product_name";
+        }
+
+        return db.rawQuery(query, null);
+    }
+
+    //retrieve user detail
+    public Cursor getUserDetails(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT username, email FROM user WHERE username=?", new String[]{username});
+    }
+
+    //update user detail
+    public boolean updateUserDetails(String oldUsername, String newEmail,String newUsername){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("username", newUsername);
+        values.put("email", newEmail);
+
+        int rowsAffected = db.update("user", values, "username=?", new String[]{oldUsername});
+        return rowsAffected > 0;
+    }
+
 }

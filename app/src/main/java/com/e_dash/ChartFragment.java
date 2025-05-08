@@ -10,6 +10,10 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -30,14 +34,37 @@ public class ChartFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chart, container, false);
         pieChart = view.findViewById(R.id.pieChart);
-        setupPieChart();
+        Spinner filterSpinner = view.findViewById(R.id.filterSpinner);
+
+
+        // Setup filter options
+        String[] filters = {"All Time", "This Month", "This Week"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, filters);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filterSpinner.setAdapter(adapter);
+
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
+                String filter = parent.getItemAtPosition(position).toString();
+                setupPieChart(filter);
+            }
+
+            @Override
+            public void  onNothingSelected(AdapterView<?> parent) {
+                setupPieChart("All time");
+            }
+        });
+
+
+        setupPieChart("ALl time");
         return view;
     }
 
-    private void setupPieChart() {
+    private void setupPieChart(String filter) {
         MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = dbHelper.getSalesData();
+        Cursor cursor = dbHelper.getSalesData(filter);
 
         ArrayList<PieEntry> entries = new ArrayList<>();
 

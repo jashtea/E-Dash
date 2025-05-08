@@ -10,15 +10,22 @@
     tools:context=".Monitor_Sales">
 
     <!-- TableLayout for product details -->
+
+
+    <!-- Add Product Button -->
+
     <TableLayout
         android:id="@+id/monitor_sales"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:stretchColumns="*"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.08">
 
         <!-- Table Header -->
         <TableRow
@@ -32,50 +39,47 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:gravity="center"
+                android:minWidth="100dp"
+                android:padding="8dp"
                 android:text="Product Name"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:minWidth="100dp"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:minWidth="70dp"
+                android:padding="8dp"
                 android:text="Price"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:minWidth="70dp"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:minWidth="70dp"
+                android:padding="8dp"
                 android:text="Qty"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:minWidth="70dp"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:minWidth="70dp"
+                android:padding="8dp"
                 android:text="Sold"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:minWidth="70dp"/>
+                android:textStyle="bold" />
 
         </TableRow>
     </TableLayout>
-
-
-    <!-- Add Product Button -->
 
     <Button
         android:id="@+id/addproduct"

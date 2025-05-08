@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class Profile extends AppCompatActivity {
 
-    private TextView log_out,user_name,user_email;
+    private TextView log_out, user_name, user_email;
     private MyDatabaseHelper myDatabaseHelper;
 
     @Override
@@ -37,27 +37,35 @@ public class Profile extends AppCompatActivity {
             }
         });
 
-            myDatabaseHelper = new MyDatabaseHelper(this);
+        myDatabaseHelper = new MyDatabaseHelper(this);
 
 
-            user_name = findViewById(R.id.username);
-            user_email = findViewById(R.id.Email);
+        user_name = findViewById(R.id.username);
+        user_email = findViewById(R.id.Email);
 
         SharedPreferences sharedPreferences = getSharedPreferences("userSession", MODE_PRIVATE);
         String username = sharedPreferences.getString("username", null);
 
         if (username != null) {
-             getInfo(username);
+            getInfo(username);
 
         }
+
+        Button editProfile = findViewById(R.id.EditProfile);
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Profile.this, editprofile.class));
+            }
+        });
 
 
     }
 
-    public void getInfo(String username){
+    public void getInfo(String username) {
         Cursor cursor = myDatabaseHelper.getUserInfo(username);
 
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             String name = cursor.getString(cursor.getColumnIndexOrThrow("username"));
             String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
 
@@ -70,7 +78,7 @@ public class Profile extends AppCompatActivity {
     }
 
 
-    public void logout(){
+    public void logout() {
         SharedPreferences sharedPreferences = getSharedPreferences("userSession", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
@@ -79,4 +87,6 @@ public class Profile extends AppCompatActivity {
         startActivity(new Intent(Profile.this, Login.class));
     }
 
+
 }
+

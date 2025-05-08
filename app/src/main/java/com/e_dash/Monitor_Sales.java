@@ -1,11 +1,9 @@
 package com.e_dash;
 
-import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -13,98 +11,97 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Monitor_Sales extends AppCompatActivity {
     private TableLayout table;
     private Button addProduct, getData;
-    private ArrayList<String> data = new ArrayList<>();
     private ArrayList<String> productData = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.monitor_sales);
+
         table = findViewById(R.id.monitor_sales);
-
-        addProduct= findViewById(R.id.addproduct);
-        addProduct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addProduct addProduct = new addProduct();
-                addProduct.show(getSupportFragmentManager(), "addProduct");
-            }
-        });
-
+        addProduct = findViewById(R.id.addproduct);
         getData = findViewById(R.id.getData);
-        getData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getTableData();
-            }
+
+        addProduct.setOnClickListener(v -> {
+            addProduct dialog = new addProduct();
+            dialog.show(getSupportFragmentManager(), "addProduct");
         });
 
+        getData.setOnClickListener(v -> {
+            MyDatabaseHelper dbHelper = new MyDatabaseHelper(Monitor_Sales.this);
+
+            for (String product : productData) {
+                String[] parts = product.split(",");
+                if (parts.length == 4) {
+                    String name = parts[0];
+                    int price = Integer.parseInt(parts[1]);
+                    int qty = Integer.parseInt(parts[2]);
+                    int sold = Integer.parseInt(parts[3]);
+
+                    // If product exists, update it. If not, insert new.
+                    if (dbHelper.productExists(name)) {
+                        boolean updated = dbHelper.updateSoldValue(name, sold);
+                        if (!updated) {
+                            Toast.makeText(this, "Failed to update: " + name, Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        boolean inserted = dbHelper.insertSale(name, price, qty, sold);
+                        if (!inserted) {
+                            Toast.makeText(this, "Failed to insert: " + name, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }
+
+            Toast.makeText(Monitor_Sales.this, "Data synced with database!", Toast.LENGTH_SHORT).show();
+        });
+
+
+
+
+
+
+        loadData(); // Load existing data when activity starts
     }
 
-    public void addProductToList(String productName, int price, int quantity, int quantitySold){
-        data.add(productName);
-        data.add(String.valueOf(quantity));
-        data.add(String.valueOf(quantitySold));
+    public void addProductToList(String productName, int price, int quantity, int quantitySold) {
+        // Avoid adding duplicate products to productData
+        for (String product : productData) {
+            if (product.startsWith(productName + ",")) {
+//                Toast.makeText(this, productName + " already in list!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
-        addTableRow(productName, price, quantity, quantitySold);
+        String item = productName + "," + price + "," + quantity + "," + quantitySold;
+        productData.add(item);
+        saveData();
+        addTableRow(productName, price, quantity, quantitySold, productData.size() - 1);
     }
 
-    private void addTableRow(String productName, double price, int quantity, int quantitySold) {
+
+    private void addTableRow(String productName, int price, int quantity, int quantitySold, int index) {
         TableRow row = new TableRow(this);
-        row.setLayoutParams(new TableLayout.LayoutParams(
-                TableLayout.LayoutParams.MATCH_PARENT,
-                TableLayout.LayoutParams.WRAP_CONTENT
-        ));
 
-        TextView nameTextView = new TextView(this);
-        nameTextView.setText(productName);
-        nameTextView.setTextColor(Color.BLACK);
-        nameTextView.setPadding(8, 8, 8, 8);
-        nameTextView.setGravity(Gravity.CENTER);
-        nameTextView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2));
+        TextView nameTextView = createCell(productName);
+        TextView priceTextView = createCell("Php" + price);
+        TextView quantityTextView = createCell(String.valueOf(quantity));
+        TextView soldTextView = createCell(String.valueOf(quantitySold));
+        soldTextView.setBackgroundResource(android.R.drawable.edit_text);
 
-        TextView priceTextView = new TextView(this);
-        priceTextView.setTextColor(Color.BLACK);
-        priceTextView.setText(String.format("Php%.2f", price));
-        priceTextView.setPadding(8, 8, 8, 8);
-        priceTextView.setGravity(Gravity.CENTER);
-        priceTextView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
-
-        TextView quantityTextView = new TextView(this);
-        quantityTextView.setTextColor(Color.BLACK);
-        quantityTextView.setText(String.valueOf(quantity));
-        quantityTextView.setPadding(8, 8, 8, 8);
-        quantityTextView.setGravity(Gravity.CENTER);
-        quantityTextView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
-
-        // Change EditText to TextView (Click to Open Dialog)
-        TextView soldTextView = new TextView(this);
-        soldTextView.setText(String.valueOf(quantitySold));
-        soldTextView.setTextColor(Color.BLACK);
-        soldTextView.setPadding(8, 8, 8, 8);
-        soldTextView.setGravity(Gravity.CENTER);
-        soldTextView.setBackgroundResource(android.R.drawable.edit_text); // Make it look like an input field
-        soldTextView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
-
-        // Add Click Listener to Open Dialog
-        soldTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showSoldQuantityDialog(soldTextView, quantity);
-            }
-        });
+        soldTextView.setOnClickListener(v ->
+                showSoldQuantityDialog(soldTextView, quantity, index)
+        );
 
         row.addView(nameTextView);
         row.addView(priceTextView);
@@ -114,72 +111,82 @@ public class Monitor_Sales extends AppCompatActivity {
         table.addView(row);
     }
 
+    private TextView createCell(String text) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextColor(Color.BLACK);
+        tv.setPadding(8, 8, 8, 8);
+        return tv;
+    }
 
-    private void showSoldQuantityDialog(TextView soldTextView, int maxQuantity) {
-        // Create a pop-up dialog
+    private void showSoldQuantityDialog(TextView soldTextView, int maxQuantity, int index) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter Sold Quantity");
 
-        // Add an input field
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setText(soldTextView.getText().toString()); // Set current value
+        input.setText(soldTextView.getText().toString());
         builder.setView(input);
 
-        // "Save" button
-        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String value = input.getText().toString();
+        builder.setPositiveButton("Save", null);
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
-                // Check if input is valid
-                if (!value.isEmpty()) {
-                    int soldQty = Integer.parseInt(value);
-                    if (soldQty >= 0 && soldQty <= maxQuantity) {
-                        soldTextView.setText(value); // Update text
-                        Toast.makeText(Monitor_Sales.this, "Updated Sold: " + soldQty, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(Monitor_Sales.this, "Invalid quantity!", Toast.LENGTH_SHORT).show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String value = input.getText().toString();
+            if (!value.isEmpty()) {
+                int soldQty = Integer.parseInt(value);
+                if (soldQty >= 0 && soldQty <= maxQuantity) {
+                    soldTextView.setText(value);
+
+                    // Update productData at correct index
+                    String[] parts = productData.get(index).split(",");
+                    if (parts.length == 4) {
+                        String updated = parts[0] + "," + parts[1] + "," + parts[2] + "," + soldQty;
+                        productData.set(index, updated);
+                        saveData();
                     }
+
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(Monitor_Sales.this, "Invalid quantity!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-        // "Cancel" button
-        builder.setNegativeButton("Cancel", null);
-
-        // Show the dialog
-        builder.show();
     }
 
-    //to get the data or sales
-    private void getTableData() {
-        TableLayout table = findViewById(R.id.monitor_sales);
-        int rowCount = table.getChildCount();
-        
-        MyDatabaseHelper dbHelper = new MyDatabaseHelper(this);
+    private void saveData() {
+        SharedPreferences prefs = getSharedPreferences("sales_data", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("product_list", new HashSet<>(productData));
+        editor.apply();
+    }
 
-        // Start from 1 to skip the header row
-        for (int i = 1; i < rowCount; i++) {
-            TableRow row = (TableRow) table.getChildAt(i);
+    private void loadData() {
+        SharedPreferences prefs = getSharedPreferences("sales_data", MODE_PRIVATE);
+        Set<String> set = prefs.getStringSet("product_list", new HashSet<>());
+        productData.clear();
+        productData.addAll(set);
 
-            String productName = ((TextView) row.getChildAt(0)).getText().toString();
-            double price = Double.parseDouble(((TextView) row.getChildAt(1)).getText().toString().replace("Php", ""));
-            int quantity = Integer.parseInt(((TextView) row.getChildAt(2)).getText().toString());
-            int sold = Integer.parseInt(((TextView) row.getChildAt(3)).getText().toString());
-
-            String name = "Jusitne";
-
-            // Insert data into the database
-            dbHelper.insertSale(productName, price, quantity, sold);
-
-
+        // Remove all rows except header (row 0)
+        if (table.getChildCount() > 1) {
+            table.removeViews(1, table.getChildCount() - 1);
         }
 
-        Toast.makeText(this, "Sales Data Saved!", Toast.LENGTH_SHORT).show();
+        for (int i = 0; i < productData.size(); i++) {
+            String product = productData.get(i);
+            String[] parts = product.split(",");
+            if (parts.length == 4) {
+                String name = parts[0];
+                int price = Integer.parseInt(parts[1]);
+                int qty = Integer.parseInt(parts[2]);
+                int sold = Integer.parseInt(parts[3]);
+                addTableRow(name, price, qty, sold, i);
+            }
+        }
     }
-
-
 
 
 }
