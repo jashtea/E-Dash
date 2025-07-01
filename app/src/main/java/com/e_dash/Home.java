@@ -16,11 +16,29 @@ public class Home extends AppCompatActivity {
     private FrameLayout fragmentContainer;
     private ImageView analytics, monitor;
 
+    private ImageView analyzing;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
+        analyzing = findViewById(R.id.MandW);
+
+        analyzing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Home.this, MandW.class));
+            }
+        });
+
+        ImageView topSales = findViewById(R.id.topSales);
+        topSales.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Home.this, Top_Products.class));
+            }
+        });
 
         chart = findViewById(R.id.analytics);
 //        fragmentContainer = findViewById(R.id.fragmentContainer);
@@ -46,13 +64,12 @@ public class Home extends AppCompatActivity {
         monitor = findViewById(R.id.monitor);
 
         monitor.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               startActivity(
-                       new Intent(Home.this, Monitor_Sales.class));
-           }
+            @Override
+            public void onClick(View v) {
+                startActivity(
+                        new Intent(Home.this, Monitor_Sales.class));
+            }
         });
-
 
 
         chart.setOnClickListener(new View.OnClickListener() {
@@ -70,4 +87,7 @@ public class Home extends AppCompatActivity {
         transaction.replace(R.id.fragmentContainer, new ChartFragment());
         transaction.commit();
     }
+
 }
+
+
