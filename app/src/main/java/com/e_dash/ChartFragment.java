@@ -91,7 +91,7 @@ public class ChartFragment extends Fragment {
         dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
         dataSet.setValueTextSize(14f);
 
-        // Display total sales in the center of the pie chart
+        // Display total sales in the center of the pie c hart
         pieChart.setCenterText("Total Sales:\n" + totalSales);
         pieChart.setCenterTextSize(16f); // Adjust text size
         pieChart.setCenterTextColor(Color.BLACK); // Set text color
@@ -106,4 +106,6 @@ public class ChartFragment extends Fragment {
         pieChart.animateY(1000); // Add animation
         pieChart.invalidate();
     }
+
+
 }
