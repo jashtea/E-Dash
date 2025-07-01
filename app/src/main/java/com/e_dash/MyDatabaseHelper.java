@@ -7,8 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
@@ -58,6 +60,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_DATE + " TEXT)";
         db.execSQL(salesTableQuery);
 
+        insertSampleDailySales(db);
+
         android.util.Log.d("DatabaseHelper", "Database created successfully");
     }
 
@@ -68,6 +72,52 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + SALES_TABLE);
         onCreate(db);
     }
+
+    // Monthly data for sales
+    public void insertSampleDailySales(SQLiteDatabase db) {
+        String[] productNames = {
+                "Spanish bread", "Star bread", "Hopia", "Mamon bar", "Ugoy-ugoy", "Cheese Pandesal",
+                "Pandesal", "Pandeletse", "biscocho", "bichukoy", "Mamon Roll", "Toasted Hopia"
+        };
+
+        int[] productPrices = {
+                8, 8, 8, 8, 10, 8,
+                2, 4, 8, 8, 8, 5
+        };
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2025, Calendar.FEBRUARY, 1); // Start: Feb 1, 2025
+
+        Calendar endDate = Calendar.getInstance();
+        endDate.set(2025, Calendar.MAY, 31); // End: May 31, 2025
+
+        Random random = new Random();
+
+        db.beginTransaction();
+        try {
+            while (!calendar.after(endDate)) {
+                String currentDate = sdf.format(calendar.getTime());
+
+                for (int i = 0; i < productNames.length; i++) {
+                    ContentValues values = new ContentValues();
+                    values.put(COLUMN_PRODUCT_NAME, productNames[i]);
+                    values.put(COLUMN_PRICE, productPrices[i]);
+                    values.put(COLUMN_QUANTITY, 100); // fixed quantity
+                    values.put(COLUMN_SOLD, 30 + random.nextInt(41)); // random sold: 30–70
+                    values.put(COLUMN_DATE, currentDate);
+
+                    db.insert(SALES_TABLE, null, values);
+                }
+
+                calendar.add(Calendar.DAY_OF_MONTH, 1); // next day
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
 
     // Insert User
     public boolean insertUser(String username, String email, String password) {

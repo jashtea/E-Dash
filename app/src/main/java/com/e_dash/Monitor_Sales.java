@@ -67,10 +67,6 @@ public class Monitor_Sales extends AppCompatActivity {
         });
 
 
-
-
-
-
         loadData(); // Load existing data when activity starts
     }
 
