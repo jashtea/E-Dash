@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class Monitor_Sales extends AppCompatActivity {
     private TableLayout table;
-    private Button addProduct, getData;
+    private Button addProduct, getData, clearData;
     private ArrayList<String> productData = new ArrayList<>();
 
     @Override
@@ -32,6 +32,8 @@ public class Monitor_Sales extends AppCompatActivity {
         addProduct = findViewById(R.id.addproduct);
         getData = findViewById(R.id.getData);
 
+        clearData = findViewById(R.id.clearData);
+
         addProduct.setOnClickListener(v -> {
             addProduct dialog = new addProduct();
             dialog.show(getSupportFragmentManager(), "addProduct");
@@ -39,6 +41,7 @@ public class Monitor_Sales extends AppCompatActivity {
 
         getData.setOnClickListener(v -> {
             MyDatabaseHelper dbHelper = new MyDatabaseHelper(Monitor_Sales.this);
+            String todayDate = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(new java.util.Date());
 
             for (String product : productData) {
                 String[] parts = product.split(",");
@@ -48,10 +51,11 @@ public class Monitor_Sales extends AppCompatActivity {
                     int qty = Integer.parseInt(parts[2]);
                     int sold = Integer.parseInt(parts[3]);
 
-                    // If product exists, update it. If not, insert new.
-                    if (dbHelper.productExists(name)) {
-                        boolean updated = dbHelper.updateSoldValue(name, sold);
-                        if (!updated) {
+                    if (dbHelper.productExists(name, todayDate)) {
+                        boolean updated = dbHelper.updateSoldValue(name, sold, todayDate);
+                        if (updated) {
+                            Toast.makeText(this, name + " updated for today!", Toast.LENGTH_SHORT).show();
+                        } else {
                             Toast.makeText(this, "Failed to update: " + name, Toast.LENGTH_SHORT).show();
                         }
                     } else {
@@ -65,6 +69,9 @@ public class Monitor_Sales extends AppCompatActivity {
 
             Toast.makeText(Monitor_Sales.this, "Data synced with database!", Toast.LENGTH_SHORT).show();
         });
+
+        // clear table
+        clearData.setOnClickListener(v -> clearSalesData());
 
 
         loadData(); // Load existing data when activity starts
@@ -182,6 +189,22 @@ public class Monitor_Sales extends AppCompatActivity {
                 addTableRow(name, price, qty, sold, i);
             }
         }
+    }
+
+
+    private void clearSalesData(){
+        SharedPreferences prefs = getSharedPreferences("sales_data", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("product_list");
+        editor.apply();
+
+        productData.clear();
+
+        if (table.getChildCount() > 1) {
+            table.removeViews(1, table.getChildCount() - 1);
+        }
+
+        Toast.makeText(this, "Sales cleared. Ready for next day!", Toast.LENGTH_SHORT).show();
     }
 
 

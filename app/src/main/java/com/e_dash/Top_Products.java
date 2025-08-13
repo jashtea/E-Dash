@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class Top_Products extends AppCompatActivity {
@@ -52,24 +53,23 @@ public class Top_Products extends AppCompatActivity {
         allProducts = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT product_name, SUM(sold) as total_sold, MAX(date) as recent_date " +
-                "FROM sales GROUP BY product_name";
-
+        String query = "SELECT product_name, sold, date FROM sales"; // ✅ Fix here
         Cursor cursor = db.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
                 String name = cursor.getString(0);
-                int salesCount = cursor.getInt(1);
+                int sold = cursor.getInt(1);
                 String saleDate = cursor.getString(2);
 
-                allProducts.add(new Product(name, salesCount, saleDate));
+                allProducts.add(new Product(name, sold, saleDate)); // 👈 each sale record is stored separately
             } while (cursor.moveToNext());
         }
 
         cursor.close();
         db.close();
     }
+
 
     private void setupTimeFrameSpinner() {
         String[] timeFrames = {"This Week", "This Month", "Last 3 Months", "This Year"};
@@ -106,18 +106,26 @@ public class Top_Products extends AppCompatActivity {
     private void updateProductsList(String timeFrame) {
         List<Product> filteredProducts = filterProductsByTimeFrame(timeFrame);
 
-        Collections.sort(filteredProducts, new Comparator<Product>() {
-            @Override
-            public int compare(Product p1, Product p2) {
-                return Integer.compare(p2.getSalesCount(), p1.getSalesCount());
-            }
-        });
+        // ✅ Summarize sales per product
+        HashMap<String, Integer> salesMap = new HashMap<>();
+        for (Product p : filteredProducts) {
+            int count = salesMap.getOrDefault(p.getName(), 0);
+            salesMap.put(p.getName(), count + p.getSalesCount());
+        }
+
+        // ✅ Convert back to Product list with summarized totals
+        List<Product> summarized = new ArrayList<>();
+        for (String name : salesMap.keySet()) {
+            summarized.add(new Product(name, salesMap.get(name), "")); // date no longer needed here
+        }
+
+        Collections.sort(summarized, (p1, p2) -> Integer.compare(p2.getSalesCount(), p1.getSalesCount()));
 
         displayList.clear();
-        int maxItems = Math.min(5, filteredProducts.size());
+        int maxItems = Math.min(5, summarized.size());
 
         for (int i = 0; i < maxItems; i++) {
-            Product product = filteredProducts.get(i);
+            Product product = summarized.get(i);
             String displayText = String.format("#%d - %s (%d sold)",
                     i + 1, product.getName(), product.getSalesCount());
             displayList.add(displayText);
@@ -129,6 +137,7 @@ public class Top_Products extends AppCompatActivity {
 
         productAdapter.notifyDataSetChanged();
     }
+
 
     private List<Product> filterProductsByTimeFrame(String timeFrame) {
         List<Product> filtered = new ArrayList<>();

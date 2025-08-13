@@ -13,38 +13,34 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MandW extends AppCompatActivity {
 
     private LineChart lineChart1, lineChart2;
     private TextView weeklyText, monthlyText;
+    private MyDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mand_w);
 
-        // Correct IDs from XML
-        lineChart1 = findViewById(R.id.lineChart1); // weekly
-        lineChart2 = findViewById(R.id.lineChart2); // monthly
+        lineChart1 = findViewById(R.id.lineChart1); // Weekly chart
+        lineChart2 = findViewById(R.id.lineChart2); // Monthly chart
 
         weeklyText = findViewById(R.id.Week);
         monthlyText = findViewById(R.id.Month);
 
-        // Populate both charts at once
+        dbHelper = new MyDatabaseHelper(this);
+
         showWeeklyChart();
         showMonthlyChart();
     }
 
     private void showWeeklyChart() {
-        ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0, 10));
-        entries.add(new Entry(1, 12));
-        entries.add(new Entry(2, 15));
-        entries.add(new Entry(3, 8));
-        entries.add(new Entry(4, 20));
-        entries.add(new Entry(5, 18));
-        entries.add(new Entry(6, 25));
+        List<String> dayLabels = new ArrayList<>();
+        List<Entry> entries = dbHelper.getWeeklySales(dayLabels);
 
         LineDataSet dataSet = new LineDataSet(entries, "Weekly Sales");
         dataSet.setColor(ContextCompat.getColor(this, android.R.color.holo_blue_dark));
@@ -52,24 +48,12 @@ public class MandW extends AppCompatActivity {
         dataSet.setLineWidth(2f);
         dataSet.setCircleRadius(4f);
 
-        String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-        setupChart(lineChart1, dataSet, days);
+        String[] labelsArray = dayLabels.toArray(new String[0]);
+        setupChart(lineChart1, dataSet, labelsArray);
     }
 
     private void showMonthlyChart() {
-        ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0, 100));
-        entries.add(new Entry(1, 150));
-        entries.add(new Entry(2, 130));
-        entries.add(new Entry(3, 170));
-        entries.add(new Entry(4, 200));
-        entries.add(new Entry(5, 180));
-        entries.add(new Entry(6, 210));
-        entries.add(new Entry(7, 230));
-        entries.add(new Entry(8, 220));
-        entries.add(new Entry(9, 190));
-        entries.add(new Entry(10, 240));
-        entries.add(new Entry(11, 250));
+        List<Entry> entries = dbHelper.getMonthlySales();
 
         LineDataSet dataSet = new LineDataSet(entries, "Monthly Sales");
         dataSet.setColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark));

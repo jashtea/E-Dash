@@ -50,16 +50,7 @@ public class Home extends AppCompatActivity {
                 startActivity(new Intent(Home.this, Profile.class));
             }
         });
-
-//        analytics = findViewById(R.id.analytics);
-//        analytics.setOnClickListener(new View.OnClickListener() {
-//                                         @Override
-//                                         public void onClick(View v) {
-//                                             startActivity(
-//                                                     new Intent(Home.this, Login.class));
-//                                         }
-//                                     });
-
+        
 
         monitor = findViewById(R.id.monitor);
 
