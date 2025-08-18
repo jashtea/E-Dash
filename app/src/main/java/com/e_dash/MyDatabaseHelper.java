@@ -309,19 +309,28 @@
             List<Entry> entries = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
 
-            // Group sales by month of the current year
+            float[] monthlyTotals = new float[12]; // default 0
+
             Cursor cursor = db.rawQuery(
-                    "SELECT strftime('%m', " + COLUMN_DATE + ") AS month, SUM(" + COLUMN_SOLD + ") " +
+                    "SELECT CAST(strftime('%m', " + COLUMN_DATE + ") AS INTEGER) AS month, " +
+                            "SUM(" + COLUMN_SOLD + ") " +
                             "FROM " + SALES_TABLE +
                             " WHERE strftime('%Y', " + COLUMN_DATE + ") = strftime('%Y', 'now') " +
                             "GROUP BY month ORDER BY month", null);
 
             while (cursor.moveToNext()) {
-                int month = cursor.getInt(0) - 1; // Jan = 0 for chart x-axis
-                float totalSold = cursor.getFloat(1);
-                entries.add(new Entry(month, totalSold));
+                int monthNum = cursor.getInt(0); // Now it's guaranteed integer 1-12
+                if (monthNum >= 1 && monthNum <= 12) {
+                    monthlyTotals[monthNum - 1] = cursor.getFloat(1);
+                }
             }
             cursor.close();
+
+            // Always fill 12 months (Jan–Dec)
+            for (int i = 0; i < 12; i++) {
+                entries.add(new Entry(i, monthlyTotals[i]));
+            }
+
             return entries;
         }
 
