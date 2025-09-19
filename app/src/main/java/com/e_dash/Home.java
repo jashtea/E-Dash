@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 public class Home extends AppCompatActivity {
 
+    private ImageView Income;
+
     private ImageView chart;
     private ImageView profile, addProduct;
     private FrameLayout fragmentContainer;
@@ -50,7 +52,7 @@ public class Home extends AppCompatActivity {
                 startActivity(new Intent(Home.this, Profile.class));
             }
         });
-        
+
 
         monitor = findViewById(R.id.monitor);
 
@@ -67,6 +69,14 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loadChartFragment();
+            }
+        });
+
+        Income = findViewById(R.id.Income);
+        Income.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Home.this, Income.class));
             }
         });
 

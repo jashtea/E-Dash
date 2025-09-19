@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    tools:context=".Income">
+
+    <!-- Title: INCOME -->
+    <TextView
+        android:id="@+id/Income"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="INCOME"
+        android:textStyle="italic"
+        android:textSize="40sp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView"
+        app:layout_constraintVertical_bias="0.05" />
+
+    <!-- Scrollable Table -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Income">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+
+            <!-- Table Title -->
+
+            <!-- Table -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#000000"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="Daily Product Sales Report"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TableLayout
+                android:id="@+id/tableSales"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#000000"
+                android:stretchColumns="*">
+
+                <!-- Header Row -->
+                <TableRow android:background="#DDDDDD">
+
+                    <TextView
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:text="Product Type" />
+
+                    <TextView
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:text="Date" />
+
+                    <TextView
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:text="Total Price" />
+
+                    <TextView
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:text="Total Sales" />
+                </TableRow>
+
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
