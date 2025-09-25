@@ -63,4 +63,6 @@ public class addProduct extends DialogFragment {
     public int getTheme() {
         return android.R.style.Theme_DeviceDefault_Light_Dialog_Alert;  // Makes it look like a pop-up
     }
+
+
 }

@@ -15,8 +15,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Monitor_Sales extends AppCompatActivity {
     private TableLayout table;
@@ -31,7 +29,6 @@ public class Monitor_Sales extends AppCompatActivity {
         table = findViewById(R.id.monitor_sales);
         addProduct = findViewById(R.id.addproduct);
         getData = findViewById(R.id.getData);
-
         clearData = findViewById(R.id.clearData);
 
         addProduct.setOnClickListener(v -> {
@@ -48,7 +45,7 @@ public class Monitor_Sales extends AppCompatActivity {
                 if (parts.length == 4) {
                     String name = parts[0];
                     int price = Integer.parseInt(parts[1]);
-                    int qty = Integer.parseInt(parts[2]);
+                    int initialQty = Integer.parseInt(parts[2]);
                     int sold = Integer.parseInt(parts[3]);
 
                     if (dbHelper.productExists(name, todayDate)) {
@@ -59,7 +56,7 @@ public class Monitor_Sales extends AppCompatActivity {
                             Toast.makeText(this, "Failed to update: " + name, Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        boolean inserted = dbHelper.insertSale(name, price, qty, sold);
+                        boolean inserted = dbHelper.insertSale(name, price, initialQty, sold);
                         if (!inserted) {
                             Toast.makeText(this, "Failed to insert: " + name, Toast.LENGTH_SHORT).show();
                         }
@@ -73,7 +70,6 @@ public class Monitor_Sales extends AppCompatActivity {
         // clear table
         clearData.setOnClickListener(v -> clearSalesData());
 
-
         loadData(); // Load existing data when activity starts
     }
 
@@ -81,29 +77,34 @@ public class Monitor_Sales extends AppCompatActivity {
         // Avoid adding duplicate products to productData
         for (String product : productData) {
             if (product.startsWith(productName + ",")) {
-//                Toast.makeText(this, productName + " already in list!", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
+        // Here we store as: name,price,initialQty,sold
         String item = productName + "," + price + "," + quantity + "," + quantitySold;
         productData.add(item);
         saveData();
         addTableRow(productName, price, quantity, quantitySold, productData.size() - 1);
     }
 
-
-    private void addTableRow(String productName, int price, int quantity, int quantitySold, int index) {
+    private void addTableRow(String productName, int price, int initialQty, int quantitySold, int index) {
         TableRow row = new TableRow(this);
 
         TextView nameTextView = createCell(productName);
         TextView priceTextView = createCell("Php" + price);
-        TextView quantityTextView = createCell(String.valueOf(quantity));
+
+        // displayed quantity = initialQty - sold
+        int displayedQty = initialQty - quantitySold;
+        if (displayedQty < 0) displayedQty = 0; // safety
+        TextView quantityTextView = createCell(String.valueOf(displayedQty));
+
         TextView soldTextView = createCell(String.valueOf(quantitySold));
         soldTextView.setBackgroundResource(android.R.drawable.edit_text);
 
+        // on click -> edit sold; pass initialQty as max allowed
         soldTextView.setOnClickListener(v ->
-                showSoldQuantityDialog(soldTextView, quantity, index)
+                showSoldQuantityDialog(soldTextView, initialQty, index)
         );
 
         row.addView(nameTextView);
@@ -122,7 +123,7 @@ public class Monitor_Sales extends AppCompatActivity {
         return tv;
     }
 
-    private void showSoldQuantityDialog(TextView soldTextView, int maxQuantity, int index) {
+    private void showSoldQuantityDialog(TextView soldTextView, int initialQty, int index) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter Sold Quantity");
 
@@ -138,64 +139,108 @@ public class Monitor_Sales extends AppCompatActivity {
         dialog.show();
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String value = input.getText().toString();
+            String value = input.getText().toString().trim();
             if (!value.isEmpty()) {
                 int soldQty = Integer.parseInt(value);
-                if (soldQty >= 0 && soldQty <= maxQuantity) {
-                    soldTextView.setText(value);
-
-                    // Update productData at correct index
+                if (soldQty >= 0 && soldQty <= initialQty) {
+                    // Update sold in productData but keep initialQty the same
                     String[] parts = productData.get(index).split(",");
                     if (parts.length == 4) {
-                        String updated = parts[0] + "," + parts[1] + "," + parts[2] + "," + soldQty;
+                        String name = parts[0];
+                        String price = parts[1];
+
+                        String updated = name + "," + price + "," + initialQty + "," + soldQty;
                         productData.set(index, updated);
                         saveData();
-                    }
 
-                    dialog.dismiss();
+                        // update table row cells
+                        TableRow row = (TableRow) table.getChildAt(index + 1); // +1 if header row exists
+                        TextView qtyCell = (TextView) row.getChildAt(2); // 0=name,1=price,2=qty,3=sold
+                        qtyCell.setText(String.valueOf(initialQty - soldQty));
+
+                        soldTextView.setText(String.valueOf(soldQty));
+
+                        dialog.dismiss();
+                    } else {
+                        // malformed entry
+                        Toast.makeText(Monitor_Sales.this, "Data error", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(Monitor_Sales.this, "Invalid quantity!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Monitor_Sales.this, "Invalid quantity! Must be 0–" + initialQty, Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
+    // Use a serialized string to preserve order (do not use Set)
     private void saveData() {
         SharedPreferences prefs = getSharedPreferences("sales_data", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putStringSet("product_list", new HashSet<>(productData));
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < productData.size(); i++) {
+            sb.append(productData.get(i));
+            if (i < productData.size() - 1) sb.append(";;"); // separator unlikely to appear in product string
+        }
+        editor.putString("product_list_serialized", sb.toString());
         editor.apply();
     }
 
+    // Load + normalize old-format entries if necessary
     private void loadData() {
         SharedPreferences prefs = getSharedPreferences("sales_data", MODE_PRIVATE);
-        Set<String> set = prefs.getStringSet("product_list", new HashSet<>());
+        String serialized = prefs.getString("product_list_serialized", "");
         productData.clear();
-        productData.addAll(set);
+
+        if (!serialized.isEmpty()) {
+            String[] items = serialized.split(java.util.regex.Pattern.quote(";;"));
+            for (String item : items) {
+                productData.add(item);
+            }
+        }
 
         // Remove all rows except header (row 0)
         if (table.getChildCount() > 1) {
             table.removeViews(1, table.getChildCount() - 1);
         }
 
+        // Normalize and render rows
+        boolean changed = false;
         for (int i = 0; i < productData.size(); i++) {
             String product = productData.get(i);
             String[] parts = product.split(",");
             if (parts.length == 4) {
-                String name = parts[0];
-                int price = Integer.parseInt(parts[1]);
-                int qty = Integer.parseInt(parts[2]);
-                int sold = Integer.parseInt(parts[3]);
-                addTableRow(name, price, qty, sold, i);
+                String name = parts[0].trim();
+                int price = Integer.parseInt(parts[1].trim());
+                int qtyStored = Integer.parseInt(parts[2].trim());
+                int sold = Integer.parseInt(parts[3].trim());
+
+                // Normalize: compute initialQty.
+                // Works for older format where parts[2] was remaining and parts[3] was sold:
+                // initialQty = remaining + sold.
+                // For fresh entries (sold==0) initialQty = qtyStored.
+                int initialQty = qtyStored + sold;
+                if (sold == 0) initialQty = qtyStored;
+
+                // Replace with normalized format (name,price,initialQty,sold)
+                String normalized = name + "," + price + "," + initialQty + "," + sold;
+                if (!normalized.equals(product)) {
+                    productData.set(i, normalized);
+                    changed = true;
+                }
+
+                addTableRow(name, price, initialQty, sold, i);
             }
         }
+
+        // If we altered productData during normalization, save back
+        if (changed) saveData();
     }
 
-
-    private void clearSalesData(){
+    private void clearSalesData() {
         SharedPreferences prefs = getSharedPreferences("sales_data", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.remove("product_list");
+        editor.remove("product_list_serialized");
         editor.apply();
 
         productData.clear();
@@ -206,6 +251,4 @@ public class Monitor_Sales extends AppCompatActivity {
 
         Toast.makeText(this, "Sales cleared. Ready for next day!", Toast.LENGTH_SHORT).show();
     }
-
-
 }

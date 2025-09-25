@@ -13,7 +13,7 @@
         android:id="@+id/Income"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="INCOME"
+        android:text="Total Revenue"
         android:textStyle="italic"
         android:textSize="40sp"
         android:textColor="@color/black"
@@ -84,7 +84,14 @@
                         android:padding="6dp"
                         android:textStyle="bold"
                         android:textColor="@color/black"
-                        android:text="Total Price" />
+                        android:text="Price" />
+
+                    <TextView
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:text="Qty Sold" />
 
                     <TextView
                         android:gravity="center"
