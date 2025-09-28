@@ -12,22 +12,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EDash"
         tools:targetApi="31">
-
-        <!-- STARTING PAGE: Login -->
+        <activity
+            android:name=".Owners_Income"
+            android:exported="false" />
         <activity
             android:name=".Login"
             android:exported="true"
             android:theme="@style/Theme.EDash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Other activities -->
-        <activity
-            android:name=".OwnersIncome"
-            android:exported="true" />
+        </activity> <!-- Other activities -->
         <activity
             android:name=".Income"
             android:exported="true" />
@@ -52,7 +49,6 @@
         <activity
             android:name=".Home"
             android:exported="false" />
-
     </application>
 
 </manifest>

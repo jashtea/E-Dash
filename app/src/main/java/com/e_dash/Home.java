@@ -18,14 +18,20 @@ public class Home extends AppCompatActivity {
     private FrameLayout fragmentContainer;
     private ImageView analytics, monitor;
 
-    private ImageView analyzing;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
-        analyzing = findViewById(R.id.MandW);
+        ImageView analyzing = findViewById(R.id.MandW);
+        ImageView salary = findViewById(R.id.salary);
+
+        salary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Home.this, Owners_Income.class));
+            }
+        });
 
         analyzing.setOnClickListener(new View.OnClickListener() {
             @Override

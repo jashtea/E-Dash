@@ -1,6 +1,7 @@
 package com.e_dash;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -45,11 +46,13 @@ public class Income extends AppCompatActivity {
             // Product Name
             TextView tv1 = new TextView(this);
             tv1.setText(cursor.getString(cursor.getColumnIndexOrThrow("product_name")));
+            tv1.setTextColor(Color.WHITE);
             tv1.setPadding(16, 8, 16, 8);
             row.addView(tv1);
 
             // Date
             TextView tv2 = new TextView(this);
+            tv2.setTextColor(Color.WHITE);
             tv2.setText(cursor.getString(cursor.getColumnIndexOrThrow("date")));
             tv2.setPadding(16, 8, 16, 8);
             row.addView(tv2);
@@ -58,12 +61,14 @@ public class Income extends AppCompatActivity {
             double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
             TextView tv3 = new TextView(this);
             tv3.setText(String.valueOf(price));
+            tv3.setTextColor(Color.WHITE);
             tv3.setPadding(16, 8, 16, 8);
             row.addView(tv3);
 
             // Sold
             int sold = cursor.getInt(cursor.getColumnIndexOrThrow("sold"));
             TextView tv4 = new TextView(this);
+            tv4.setTextColor(Color.WHITE);
             tv4.setText(String.valueOf(sold));
             tv4.setPadding(16, 8, 16, 8);
             row.addView(tv4);
@@ -72,6 +77,7 @@ public class Income extends AppCompatActivity {
             double totalSales = price * sold;
             TextView tv5 = new TextView(this);
             tv5.setText(String.valueOf(totalSales));
+            tv5.setTextColor(Color.WHITE);
             tv5.setPadding(16, 8, 16, 8);
             row.addView(tv5);
 
