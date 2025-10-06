@@ -8,11 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class Profile extends AppCompatActivity {
 
@@ -51,11 +47,11 @@ public class Profile extends AppCompatActivity {
 
         }
 
-        Button editProfile = findViewById(R.id.EditProfile);
+        Button editProfile = findViewById(R.id.editProfile);
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Profile.this, editprofile.class));
+                startActivity(new Intent(Profile.this, Editprofile.class));
             }
         });
 

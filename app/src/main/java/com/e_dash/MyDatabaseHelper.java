@@ -23,7 +23,7 @@
 
         // Database elements
         private static final String DATABASE_NAME = "Edash.db";
-        private static final int DATABASE_VERSION = 3;
+        private static final int DATABASE_VERSION = 4;
 
         // User table
         private static final String TABLE_NAME = "user";
@@ -39,8 +39,21 @@
         private static final String COLUMN_PRICE = "price";
         private static final String COLUMN_QUANTITY = "quantity";
         private static final String COLUMN_SOLD = "sold";
-
         private static final String COLUMN_DATE = "date";
+
+        // Sales Revenue
+        private static final String SALES_REVENUE_TABLE = "sales_revenue";
+        private static final String COLUMN_REVENUE_ID = "revenue_id";
+        private static final String COLUMN_TOTAL_REVENUE = "total_revenue";
+        private static final String COLUMN_DATE_SALES = "date";
+
+        // Expenses
+
+        private static final String EXPENSES_TABLE = "expenses_table";
+        private static final String EXPENSES_ID = "expenses_id";
+        private static final String EXPENSES_DESCRIPTION = "expenses_desc";
+        private static final String EXPENSES_AMOUNT = "amount";
+
 
         // Constructor
         public MyDatabaseHelper(Context context) {
@@ -67,7 +80,25 @@
                     COLUMN_DATE + " TEXT)";
             db.execSQL(salesTableQuery);
 
-    //        insertSampleDailySales(db);
+            // Sales revenue table
+            String revenueTableQuery = "CREATE TABLE " + SALES_REVENUE_TABLE + " (" +
+                    COLUMN_REVENUE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_TOTAL_REVENUE + " REAL, " +
+                    COLUMN_DATE_SALES + " TEXT UNIQUE)";
+            db.execSQL(revenueTableQuery);
+
+            // Expenses amount table
+            String CREATE_EXPENSES_TABLE = "CREATE TABLE " + EXPENSES_TABLE + " (" +
+                    EXPENSES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    EXPENSES_DESCRIPTION + " TEXT, " +
+                    EXPENSES_AMOUNT + " REAL, " +
+                    "date TEXT)";   // add date if you want filtering by date
+
+            db.execSQL(CREATE_EXPENSES_TABLE);
+
+
+
+            //        insertSampleDailySales(db);
 
             android.util.Log.d("DatabaseHelper", "Database created successfully");
         }
@@ -77,53 +108,21 @@
             // Instead of dropping tables, consider migrating data properly
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + SALES_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + SALES_REVENUE_TABLE);
             onCreate(db);
         }
 
-        // Monthly data for sales
-    //    public void insertSampleDailySales(SQLiteDatabase db) {
-    //        String[] productNames = {
-    //                "Spanish bread", "Star bread", "Hopia", "Mamon bar", "Ugoy-ugoy", "Cheese Pandesal",
-    //                "Pandesal", "Pandeletse", "biscocho", "bichukoy", "Mamon Roll", "Toasted Hopia"
-    //        };
-    //
-    //        int[] productPrices = {
-    //                8, 8, 8, 8, 10, 8,
-    //                2, 4, 8, 8, 8, 5
-    //        };
-    //
-    //        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-    //        Calendar calendar = Calendar.getInstance();
-    //        calendar.set(2025, Calendar.FEBRUARY, 1); // Start: Feb 1, 2025
-    //
-    //        Calendar endDate = Calendar.getInstance();
-    //        endDate.set(2025, Calendar.MAY, 31); // End: May 31, 2025
-    //
-    //        Random random = new Random();
-    //
-    //        db.beginTransaction();
-    //        try {
-    //            while (!calendar.after(endDate)) {
-    //                String currentDate = sdf.format(calendar.getTime());
-    //
-    //                for (int i = 0; i < productNames.length; i++) {
-    //                    ContentValues values = new ContentValues();
-    //                    values.put(COLUMN_PRODUCT_NAME, productNames[i]);
-    //                    values.put(COLUMN_PRICE, productPrices[i]);
-    //                    values.put(COLUMN_QUANTITY, 100); // fixed quantity
-    //                    values.put(COLUMN_SOLD, 30 + random.nextInt(41)); // random sold: 30–70
-    //                    values.put(COLUMN_DATE, currentDate);
-    //
-    //                    db.insert(SALES_TABLE, null, values);
-    //                }
-    //
-    //                calendar.add(Calendar.DAY_OF_MONTH, 1); // next day
-    //            }
-    //            db.setTransactionSuccessful();
-    //        } finally {
-    //            db.endTransaction();
-    //        }
-    //    }
+        //Insert Sales Revenue
+
+        public boolean insertRevenue(String productName, double totalRevenue, String date) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_TOTAL_REVENUE, totalRevenue);
+            values.put(COLUMN_DATE_SALES, date);
+
+            long result = db.insert(SALES_REVENUE_TABLE, null, values);
+            return result != -1;
+        }
 
 
         // Insert User
@@ -150,6 +149,9 @@
             cursor.close();
             db.close();
             return exist;
+
+
+
         }
 
         // Get User Info
@@ -181,7 +183,6 @@
         }
 
 
-
         //Update sales
         // Update sold value for a specific product on a specific date
         public boolean updateSoldValue(String name, int sold, String date) {
@@ -210,14 +211,6 @@
         }
 
 
-
-
-        // Fetch Sales Data for PieChart
-    //    public Cursor getSalesData() {
-    //        SQLiteDatabase db = this.getReadableDatabase();
-    //        Cursor cursor = db.rawQuery("SELECT " + COLUMN_PRODUCT_NAME + ", " + COLUMN_SOLD + " FROM " + SALES_TABLE, null);
-    //        return cursor;
-    //    }
 
         // Filter data for pie chart
         public Cursor getSalesData(String filter) {
@@ -334,6 +327,70 @@
             return entries;
         }
 
+        // Save the sales total in sales_revenue table
+
+        public void saveAllDailyTotals(){
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            Cursor dateCursor = db.rawQuery("SELECT DISTINCT date FROM sales", null);
+            if (dateCursor.moveToFirst()) {
+                do {
+                    String date = dateCursor.getString(dateCursor.getColumnIndexOrThrow("date"));
+
+                    Cursor totalCursor = db.rawQuery(
+                            "SELECT SUM(price * sold) as total FROM sales WHERE date = ?",
+                            new String[]{date}
+                    );
+
+                    double total = 0;
+
+                    if (totalCursor.moveToFirst()){
+                        total = totalCursor.getDouble(totalCursor.getColumnIndexOrThrow("total"));
+                    }
+
+                    totalCursor.close();
+
+
+                    ContentValues values = new ContentValues();
+                    values.put(COLUMN_TOTAL_REVENUE, total);
+                    values.put(COLUMN_DATE_SALES, date);
+
+                    db.insertWithOnConflict(SALES_REVENUE_TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+                }while (dateCursor.moveToNext());
+            }
+
+            dateCursor.close();
+            db.close();
+        }
+
+        public boolean addExpense(String desc, double amount, String date) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(EXPENSES_DESCRIPTION, desc);
+            values.put(EXPENSES_AMOUNT, amount);
+            values.put("date", date);
+
+            long result = db.insert(EXPENSES_TABLE, null, values);
+            return result != -1; // returns true if insert is successful
+        }
+        public double getTotalExpenses(String filterDate) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            double total = 0.0;
+
+            Cursor cursor;
+            if (filterDate == null) {
+                cursor = db.rawQuery("SELECT SUM(" + EXPENSES_AMOUNT + ") as total FROM " + EXPENSES_TABLE, null);
+            } else {
+                cursor = db.rawQuery("SELECT SUM(" + EXPENSES_AMOUNT + ") as total FROM " + EXPENSES_TABLE + " WHERE date = ?", new String[]{filterDate});
+            }
+
+            if (cursor.moveToFirst()) {
+                total = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
+            }
+            cursor.close();
+            return total;
+        }
 
 
 

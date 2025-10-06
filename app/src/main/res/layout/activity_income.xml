@@ -8,14 +8,14 @@
     android:background="@color/colorAccent"
     tools:context=".Income">
 
-    <!-- Title: INCOME -->
+    <!-- Title -->
     <TextView
         android:id="@+id/Income"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Total Revenue"
-        android:textStyle="italic"
-        android:textSize="40sp"
+        android:text="INCOME"
+        android:textStyle="bold"
+        android:textSize="32sp"
         android:textColor="@color/black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,14 +23,13 @@
         app:layout_constraintBottom_toTopOf="@+id/scrollView"
         app:layout_constraintVertical_bias="0.05" />
 
-    <!-- Scrollable Table -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/Income">
 
@@ -40,10 +39,37 @@
             android:orientation="vertical"
             android:padding="10dp">
 
+            <!-- ✅ Pick Date Button -->
+            <Button
+                android:id="@+id/btnPickDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pick Date" />
+
+            <!-- ✅ Selected Date -->
+            <TextView
+                android:id="@+id/tvSelectedDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No date selected"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:padding="8dp" />
+
+            <!-- ✅ Total Revenue Display -->
+            <TextView
+                android:id="@+id/tvTotalRevenue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#222222"
+                android:text="Total Revenue: 0.0"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:padding="10dp"
+                android:gravity="center" />
 
             <!-- Table Title -->
-
-            <!-- Table -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
