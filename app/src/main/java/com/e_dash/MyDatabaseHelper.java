@@ -366,33 +366,41 @@
 
         public boolean addExpense(String desc, double amount, String date) {
             SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(EXPENSES_DESCRIPTION, desc);
-            values.put(EXPENSES_AMOUNT, amount);
-            values.put("date", date);
+            ContentValues cv = new ContentValues();
+            cv.put(EXPENSES_DESCRIPTION, desc);
+            cv.put(EXPENSES_AMOUNT, amount);
+            cv.put("date", date);
 
-            long result = db.insert(EXPENSES_TABLE, null, values);
-            return result != -1; // returns true if insert is successful
+            long result = db.insert("expenses_table", null, cv);
+            db.close();
+            return result != -1;
         }
-        public double getTotalExpenses(String filterDate) {
+
+        public double getTotalExpensesBetween(String start, String end) {
             SQLiteDatabase db = this.getReadableDatabase();
-            double total = 0.0;
-
-            Cursor cursor;
-            if (filterDate == null) {
-                cursor = db.rawQuery("SELECT SUM(" + EXPENSES_AMOUNT + ") as total FROM " + EXPENSES_TABLE, null);
-            } else {
-                cursor = db.rawQuery("SELECT SUM(" + EXPENSES_AMOUNT + ") as total FROM " + EXPENSES_TABLE + " WHERE date = ?", new String[]{filterDate});
+            Cursor c = db.rawQuery("SELECT SUM(amount) FROM expenses_table WHERE date BETWEEN ? AND ?",
+                    new String[]{start, end});
+            double total = 0;
+            if (c.moveToFirst()) {
+                total = c.getDouble(0);
             }
-
-            if (cursor.moveToFirst()) {
-                total = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
-            }
-            cursor.close();
+            c.close();
             return total;
         }
 
+        public double getTotalRevenueBetween(String start, String end) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT SUM(" + COLUMN_TOTAL_REVENUE + ") FROM " + SALES_REVENUE_TABLE +
+                            " WHERE " + COLUMN_DATE_SALES + " BETWEEN ? AND ?",
+                    new String[]{start, end});
 
+            double total = 0;
+            if (c.moveToFirst()) {
+                total = c.getDouble(0);
+            }
+            c.close();
+            return total;
+        }
 
 
     }

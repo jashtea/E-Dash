@@ -22,6 +22,63 @@
             android:padding="8dp"
             android:textColor="@android:color/black"/>
 
+        <!-- Date Range Picker Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date Range (for weekly grouping)"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingTop="12dp"
+            android:textColor="@android:color/black"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/txtStartDate"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Start Date"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text"
+                android:gravity="center_vertical"/>
+
+            <Button
+                android:id="@+id/btnPickStartDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/txtEndDate"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="End Date"
+                android:padding="8dp"
+                android:background="@android:drawable/edit_text"
+                android:gravity="center_vertical"/>
+
+            <Button
+                android:id="@+id/btnPickEndDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick"/>
+        </LinearLayout>
+
         <!-- Expense Input Section -->
         <TextView
             android:layout_width="wrap_content"
@@ -100,5 +157,6 @@
             android:textSize="16sp"
             android:textColor="#2E7D32"
             android:paddingTop="6dp"/>
+
     </LinearLayout>
 </ScrollView>
