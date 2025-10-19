@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="@color/white"
     tools:context=".Stocks">
 
     <!-- Title -->
@@ -14,15 +15,15 @@
         android:id="@+id/titleStocks"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="Stocks"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- RecyclerView / List of Stocks -->
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerStocks"
         android:layout_width="0dp"
@@ -30,13 +31,14 @@
         android:clipToPadding="false"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
+        android:background="@color/white"
         app:layout_constraintTop_toBottomOf="@id/titleStocks"
         app:layout_constraintBottom_toTopOf="@id/buttonContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_stock"/>
 
-    <!-- Buttons for Stock In / Stock Out -->
+    <!-- Buttons -->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="0dp"
@@ -45,6 +47,7 @@
         android:gravity="center"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
+        android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -64,9 +67,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:backgroundTint="#F44336"
             android:text="Stock Out"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#F44336"/>
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 

@@ -23,7 +23,7 @@
 
         // Database elements
         private static final String DATABASE_NAME = "Edash.db";
-        private static final int DATABASE_VERSION = 5;
+        private static final int DATABASE_VERSION = 7;
 
         // User table
         private static final String TABLE_NAME = "user";
@@ -63,6 +63,7 @@
         private static final String STOCKS_COLUMN_ID = "id";
         private static final String COLUMN_INGREDIENT = "ingredient_name";
         private static final String STOCKS_COLUMN_QUANTITY = "quantity";
+        private static final String STOCKS_COLUMN_UNIT = "unit";
         private static final String STOCKS_COLUMN_DATE = "date";
 
 
@@ -114,13 +115,16 @@
                     STOCKS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_INGREDIENT + " TEXT, " +
                     STOCKS_COLUMN_QUANTITY + " REAL, " +
+                    STOCKS_COLUMN_UNIT + " TEXT, " +                       // added unit column
                     STOCKS_COLUMN_DATE + " DATE DEFAULT (DATE('now')))");
+
 
             // Stock Out Table
             db.execSQL("CREATE TABLE " + TABLE_STOCK_OUT + " (" +
                     STOCKS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_INGREDIENT + " TEXT, " +
                     STOCKS_COLUMN_QUANTITY + " REAL, " +
+                    STOCKS_COLUMN_UNIT + " TEXT, " +      // added unit column
                     STOCKS_COLUMN_DATE + " DATE DEFAULT (DATE('now')))");
 
             //        insertSampleDailySales(db);
@@ -450,26 +454,33 @@
         }
 
         // ---------- STOCK IN ----------
-        public boolean addStockIn(String ingredient, double quantity) {
+        public boolean addStockIn(String ingredient, double quantity, String unit, String date) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put(COLUMN_INGREDIENT, ingredient);
             cv.put(COLUMN_QUANTITY, quantity);
+            cv.put(STOCKS_COLUMN_UNIT, unit);
+            cv.put(COLUMN_DATE, date);
             long result = db.insert(TABLE_STOCK_IN, null, cv);
             db.close();
             return result != -1;
         }
 
+
         // ---------- STOCK OUT ----------
-        public boolean addStockOut(String ingredient, double quantity) {
+        public boolean addStockOut(String ingredient, double quantity, String unit, String date) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put(COLUMN_INGREDIENT, ingredient);
             cv.put(COLUMN_QUANTITY, quantity);
+            cv.put(STOCKS_COLUMN_UNIT, unit);
+            cv.put(COLUMN_DATE, date);
             long result = db.insert(TABLE_STOCK_OUT, null, cv);
             db.close();
             return result != -1;
         }
+
+
 
         // ---------- TOTALS ----------
         public double getTotalStockIn(String ingredient) {

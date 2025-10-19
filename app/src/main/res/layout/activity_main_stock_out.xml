@@ -39,48 +39,73 @@
                 android:layout_height="wrap_content">
 
                 <!-- Ingredient Used -->
-                <TextView
-                    android:text="Ingredient Used"
-                    android:textSize="16sp"
-                    android:textColor="#333"
-                    android:layout_marginBottom="6dp" />
-
-                <EditText
-                    android:id="@+id/editIngredientUsed"
-                    android:hint="e.g. Harina, Asukal, Mantika"
-                    android:drawableStart="@android:drawable/ic_menu_edit"
-                    android:drawablePadding="8dp"
-                    android:padding="12dp"
-                    android:background="@drawable/rounded_edittext"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="Ingredient Used"
+                    app:startIconDrawable="@android:drawable/ic_menu_edit">
 
-                <!-- Quantity Used -->
-                <TextView
-                    android:text="Quantity Used"
-                    android:textSize="16sp"
-                    android:textColor="#333"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editIngredientUsed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Quantity + Unit -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="6dp" />
+                    android:gravity="center_vertical">
 
-                <EditText
-                    android:id="@+id/editQuantityOut"
-                    android:hint="e.g. 2 kg"
-                    android:inputType="numberDecimal"
-                    android:drawableStart="@android:drawable/ic_delete"
-                    android:drawablePadding="8dp"
-                    android:padding="12dp"
-                    android:background="@drawable/rounded_edittext"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="wrap_content"
+                        android:hint="Quantity Used"
+                        app:startIconDrawable="@android:drawable/ic_delete">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editQuantityOut"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Spinner
+                        android:id="@+id/spinnerUnitOut"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:spinnerMode="dropdown"/>
+                </LinearLayout>
+
+                <!-- Date (optional) -->
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="Stock-Out Date"
+                    android:layout_marginTop="16dp"
+                    app:startIconDrawable="@android:drawable/ic_menu_my_calendar">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editStockOutDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Save Button -->
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSaveStockOut"
                     android:text="SAVE STOCK-OUT"
                     android:textStyle="bold"
-                    android:textColor="#FFFFFF"
                     android:layout_marginTop="24dp"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="12dp"
                     android:backgroundTint="#F44336"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
