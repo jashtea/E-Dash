@@ -66,6 +66,7 @@
                 android:id="@+id/txtEndDate"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:textColor="@color/black"
                 android:layout_height="wrap_content"
                 android:text="End Date"
                 android:padding="8dp"
@@ -92,6 +93,8 @@
         <EditText
             android:id="@+id/expenseDesc"
             android:layout_width="match_parent"
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
             android:layout_height="wrap_content"
             android:hint="Expense Description"
             android:inputType="text"
@@ -103,6 +106,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Expense Amount"
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
             android:inputType="numberDecimal"
             android:padding="8dp"
             android:background="@android:drawable/edit_text"
@@ -137,7 +142,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Total Revenue: Php 0.00"
+            android:textColor="@color/gray"
             android:textSize="15sp"
+            android:textStyle="bold"
             android:paddingTop="8dp"/>
 
         <TextView
@@ -146,6 +153,8 @@
             android:layout_height="wrap_content"
             android:text="Total Expenses: Php 0.00"
             android:textSize="15sp"
+            android:textColor="@color/gray"
+            android:textStyle="bold"
             android:paddingTop="4dp"/>
 
         <TextView

@@ -23,7 +23,7 @@
 
         // Database elements
         private static final String DATABASE_NAME = "Edash.db";
-        private static final int DATABASE_VERSION = 4;
+        private static final int DATABASE_VERSION = 5;
 
         // User table
         private static final String TABLE_NAME = "user";
@@ -48,11 +48,22 @@
         private static final String COLUMN_DATE_SALES = "date";
 
         // Expenses
-
         private static final String EXPENSES_TABLE = "expenses_table";
         private static final String EXPENSES_ID = "expenses_id";
         private static final String EXPENSES_DESCRIPTION = "expenses_desc";
         private static final String EXPENSES_AMOUNT = "amount";
+        private static final String START_DATE = "start_date";
+        private static final String END_DATE = "end_date";
+
+        // Stocks Table
+        private static final String TABLE_STOCK_IN = "stock_in";
+        private static final String TABLE_STOCK_OUT = "stock_out";
+
+        // COMMON COLUMNS
+        private static final String STOCKS_COLUMN_ID = "id";
+        private static final String COLUMN_INGREDIENT = "ingredient_name";
+        private static final String STOCKS_COLUMN_QUANTITY = "quantity";
+        private static final String STOCKS_COLUMN_DATE = "date";
 
 
         // Constructor
@@ -92,11 +103,25 @@
                     EXPENSES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     EXPENSES_DESCRIPTION + " TEXT, " +
                     EXPENSES_AMOUNT + " REAL, " +
-                    "date TEXT)";   // add date if you want filtering by date
-
+                    START_DATE + " TEXT, " +
+                    END_DATE + " TEXT)";   // add date if you want filtering by date
             db.execSQL(CREATE_EXPENSES_TABLE);
 
 
+            // Create Stock In Table
+            // Stock In Table
+            db.execSQL("CREATE TABLE " + TABLE_STOCK_IN + " (" +
+                    STOCKS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_INGREDIENT + " TEXT, " +
+                    STOCKS_COLUMN_QUANTITY + " REAL, " +
+                    STOCKS_COLUMN_DATE + " DATE DEFAULT (DATE('now')))");
+
+            // Stock Out Table
+            db.execSQL("CREATE TABLE " + TABLE_STOCK_OUT + " (" +
+                    STOCKS_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_INGREDIENT + " TEXT, " +
+                    STOCKS_COLUMN_QUANTITY + " REAL, " +
+                    STOCKS_COLUMN_DATE + " DATE DEFAULT (DATE('now')))");
 
             //        insertSampleDailySales(db);
 
@@ -109,6 +134,9 @@
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " + SALES_TABLE);
             db.execSQL("DROP TABLE IF EXISTS " + SALES_REVENUE_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + EXPENSES_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_STOCK_IN);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_STOCK_OUT);
             onCreate(db);
         }
 
@@ -364,12 +392,13 @@
             db.close();
         }
 
-        public boolean addExpense(String desc, double amount, String date) {
+        public boolean addExpense(String desc, double amount, String startDate, String endDate) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put(EXPENSES_DESCRIPTION, desc);
             cv.put(EXPENSES_AMOUNT, amount);
-            cv.put("date", date);
+            cv.put(START_DATE, startDate);
+            cv.put(END_DATE, endDate);
 
             long result = db.insert("expenses_table", null, cv);
             db.close();
@@ -378,29 +407,109 @@
 
         public double getTotalExpensesBetween(String start, String end) {
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor c = db.rawQuery("SELECT SUM(amount) FROM expenses_table WHERE date BETWEEN ? AND ?",
-                    new String[]{start, end});
             double total = 0;
+
+            String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    .format(new Date());
+
+            String query = "SELECT SUM(amount) FROM expenses_table " +
+                    "WHERE (? BETWEEN start_date AND end_date) " + // current date inside expense range
+                    "AND (start_date <= ? AND end_date >= ?)";     // overlaps with selected range
+
+            Cursor c = db.rawQuery(query, new String[]{currentDate, end, start});
+
             if (c.moveToFirst()) {
                 total = c.getDouble(0);
             }
-            c.close();
+
+
             return total;
         }
 
-        public double getTotalRevenueBetween(String start, String end) {
+        public double getTotalRevenueBasedOnExpenseDates(String start, String end) {
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor c = db.rawQuery("SELECT SUM(" + COLUMN_TOTAL_REVENUE + ") FROM " + SALES_REVENUE_TABLE +
-                            " WHERE " + COLUMN_DATE_SALES + " BETWEEN ? AND ?",
-                    new String[]{start, end});
-
             double total = 0;
+
+            String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    .format(new Date());
+
+            String query = "SELECT SUM(s." + COLUMN_TOTAL_REVENUE + ") " +
+                    "FROM " + SALES_REVENUE_TABLE + " AS s " +
+                    "JOIN expenses_table AS e " +
+                    "ON s." + COLUMN_DATE_SALES + " BETWEEN e.start_date AND e.end_date " +
+                    "WHERE (? BETWEEN e.start_date AND e.end_date) " + // current date within expense
+                    "AND (e.start_date <= ? AND e.end_date >= ?)";     // overlaps selected range
+
+            Cursor c = db.rawQuery(query, new String[]{currentDate, end, start});
+
             if (c.moveToFirst()) {
                 total = c.getDouble(0);
             }
+
+            return total;
+        }
+
+        // ---------- STOCK IN ----------
+        public boolean addStockIn(String ingredient, double quantity) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put(COLUMN_INGREDIENT, ingredient);
+            cv.put(COLUMN_QUANTITY, quantity);
+            long result = db.insert(TABLE_STOCK_IN, null, cv);
+            db.close();
+            return result != -1;
+        }
+
+        // ---------- STOCK OUT ----------
+        public boolean addStockOut(String ingredient, double quantity) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put(COLUMN_INGREDIENT, ingredient);
+            cv.put(COLUMN_QUANTITY, quantity);
+            long result = db.insert(TABLE_STOCK_OUT, null, cv);
+            db.close();
+            return result != -1;
+        }
+
+        // ---------- TOTALS ----------
+        public double getTotalStockIn(String ingredient) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT SUM(" + COLUMN_QUANTITY + ") FROM " + TABLE_STOCK_IN +
+                    " WHERE " + COLUMN_INGREDIENT + "=?", new String[]{ingredient});
+            double total = 0;
+            if (c.moveToFirst()) total = c.getDouble(0);
             c.close();
             return total;
         }
+
+        public double getTotalStockOut(String ingredient) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT SUM(" + COLUMN_QUANTITY + ") FROM " + TABLE_STOCK_OUT +
+                    " WHERE " + COLUMN_INGREDIENT + "=?", new String[]{ingredient});
+            double total = 0;
+            if (c.moveToFirst()) total = c.getDouble(0);
+            c.close();
+            return total;
+        }
+
+        public double getRemainingStock(String ingredient) {
+            double inQty = getTotalStockIn(ingredient);
+            double outQty = getTotalStockOut(ingredient);
+            return inQty - outQty;
+        }
+
+        public Cursor getAllIngredients() {
+            SQLiteDatabase db = this.getReadableDatabase();
+            // Combine distinct ingredient names from both tables
+            return db.rawQuery(
+                    "SELECT DISTINCT " + COLUMN_INGREDIENT + " FROM " + TABLE_STOCK_IN +
+                            " UNION SELECT DISTINCT " + COLUMN_INGREDIENT + " FROM " + TABLE_STOCK_OUT,
+                    null);
+        }
+
+
+
+
 
 
     }
