@@ -12,43 +12,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EDash"
         tools:targetApi="31">
-        <activity
-            android:name=".Owners_Income"
-            android:exported="false" />
-        <activity
-            android:name=".Login"
-            android:exported="true"
-            android:theme="@style/Theme.EDash">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> <!-- Other activities -->
-        <activity
-            android:name=".Income"
-            android:exported="true" />
-        <activity
-            android:name=".Top_Products"
-            android:exported="false" />
-        <activity
-            android:name=".MandW"
-            android:exported="false" />
-        <activity
-            android:name=".Editprofile"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Monitor_Sales"
-            android:exported="false" />
-        <activity
-            android:name=".Profile"
-            android:exported="false" />
+        <!-- Set Home as the launcher -->
         <activity
             android:name=".Home"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Other activities -->
+        <activity android:name=".Stocks" android:exported="false" />
+        <activity android:name=".Owners_Income" android:exported="false" />
+        <activity android:name=".Login" android:exported="false" android:theme="@style/Theme.EDash" />
+        <activity android:name=".Income" android:exported="false" />
+        <activity android:name=".Top_Products" android:exported="false" />
+        <activity android:name=".MandW" android:exported="false" />
+        <activity android:name=".Editprofile" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".Monitor_Sales" android:exported="false" />
+        <activity android:name=".Profile" android:exported="false" />
+
     </application>
 
 </manifest>

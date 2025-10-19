@@ -17,6 +17,7 @@ public class Home extends AppCompatActivity {
     private ImageView profile, addProduct;
     private FrameLayout fragmentContainer;
     private ImageView analytics, monitor;
+    private ImageView stocks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,18 @@ public class Home extends AppCompatActivity {
             }
         });
 
+        stocks = findViewById(R.id.stocks);
+
+        stocks = findViewById(R.id.stocks);
+        stocks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            startActivity(new Intent (Home.this, Stocks.class));
+
+            }
+        });
+
 
         monitor = findViewById(R.id.monitor);
 
@@ -84,6 +97,7 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 startActivity(new Intent(Home.this, Income.class));
             }
+
         });
 
     }

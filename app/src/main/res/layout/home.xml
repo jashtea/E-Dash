@@ -9,6 +9,9 @@
     tools:context=".Home"
     android:background="@drawable/background">
 
+    <!-- Add a FragmentContainerView to load the PieChart Fragment -->
+
+
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
@@ -20,10 +23,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.032" />
-
-    <!-- Add a FragmentContainerView to load the PieChart Fragment -->
-
+        app:layout_constraintVertical_bias="0.02" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
@@ -59,6 +59,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.976" />
+
 
     <ImageView
         android:id="@+id/Profile"
@@ -127,6 +128,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.976"
         app:srcCompat="@drawable/income" />
+
+
+    <ImageView
+        android:id="@+id/stocks"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/stock"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.957"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.03" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
