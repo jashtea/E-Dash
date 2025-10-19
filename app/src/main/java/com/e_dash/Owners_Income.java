@@ -103,8 +103,10 @@ public class Owners_Income extends AppCompatActivity {
     private void saveExpense() {
         String desc = expenseDesc.getText().toString().trim();
         String amountStr = expenseAmount.getText().toString().trim();
+        String startDate = txtStartDate.getText().toString().trim();
+        String endDate = txtEndDate.getText().toString().trim();
 
-        if (desc.isEmpty() || amountStr.isEmpty()) {
+        if (desc.isEmpty() || amountStr.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -117,12 +119,11 @@ public class Owners_Income extends AppCompatActivity {
             return;
         }
 
-        // Use today’s date for expense entry
-        String todayStr = sdf.format(new Date());
-        boolean inserted = dbHelper.addExpense(desc, amount, todayStr);
+        // ✅ Save both start and end date in the database
+        boolean inserted = dbHelper.addExpense(desc, amount, startDate, endDate);
 
         if (inserted) {
-            Toast.makeText(this, "Expense saved!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Expense saved from " + startDate + " to " + endDate, Toast.LENGTH_SHORT).show();
             expenseDesc.setText("");
             expenseAmount.setText("");
             loadSummary();
@@ -130,6 +131,7 @@ public class Owners_Income extends AppCompatActivity {
             Toast.makeText(this, "Failed to save expense", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void loadSummary() {
         if (startCal == null || endCal == null) {
@@ -143,7 +145,7 @@ public class Owners_Income extends AppCompatActivity {
         String endStr = sdf.format(endCal.getTime());
 
         double totalExpenses = dbHelper.getTotalExpensesBetween(startStr, endStr);
-        double totalRevenue = dbHelper.getTotalRevenueBetween(startStr, endStr);
+        double totalRevenue = dbHelper.getTotalRevenueBasedOnExpenseDates(startStr, endStr);
         double ownerIncome = totalRevenue - totalExpenses;
 
         txtExpenses.setText(String.format(Locale.getDefault(),

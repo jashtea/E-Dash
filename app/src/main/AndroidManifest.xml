@@ -13,6 +13,21 @@
         android:theme="@style/Theme.EDash"
         tools:targetApi="31">
         <activity
+            android:name=".StockOutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Stock_in"
+            android:exported="false" />
+        <activity
+            android:name=".MainStockInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainStockOutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".StockActivity"
+            android:exported="false" />
+        <activity
             android:name=".Owners_Income"
             android:exported="false" />
         <activity
