@@ -480,6 +480,34 @@
             return result != -1;
         }
 
+        // Unit
+        // Fetch unit for an ingredient (check stock_in first, then stock_out)
+        public String getUnit(String ingredient) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String unit = "pcs"; // default
+
+            // Check STOCK_IN
+            Cursor cursor = db.rawQuery(
+                    "SELECT " + STOCKS_COLUMN_UNIT + " FROM " + TABLE_STOCK_IN + " WHERE " + COLUMN_INGREDIENT + " = ? LIMIT 1",
+                    new String[]{ingredient}
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                unit = cursor.getString(cursor.getColumnIndexOrThrow(STOCKS_COLUMN_UNIT));
+                cursor.close();
+            } else {
+                // Check STOCK_OUT
+                Cursor cursor2 = db.rawQuery(
+                        "SELECT " + STOCKS_COLUMN_UNIT + " FROM " + TABLE_STOCK_OUT + " WHERE " + COLUMN_INGREDIENT + " = ? LIMIT 1",
+                        new String[]{ingredient}
+                );
+                if (cursor2 != null && cursor2.moveToFirst()) {
+                    unit = cursor2.getString(cursor2.getColumnIndexOrThrow(STOCKS_COLUMN_UNIT));
+                    cursor2.close();
+                }
+            }
+
+            return unit;
+        }
 
 
         // ---------- TOTALS ----------
@@ -493,22 +521,7 @@
             return total;
         }
 
-        public double getTotalStockOut(String ingredient) {
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor c = db.rawQuery("SELECT SUM(" + COLUMN_QUANTITY + ") FROM " + TABLE_STOCK_OUT +
-                    " WHERE " + COLUMN_INGREDIENT + "=?", new String[]{ingredient});
-            double total = 0;
-            if (c.moveToFirst()) total = c.getDouble(0);
-            c.close();
-            return total;
-        }
-
-        public double getRemainingStock(String ingredient) {
-            double inQty = getTotalStockIn(ingredient);
-            double outQty = getTotalStockOut(ingredient);
-            return inQty - outQty;
-        }
-
+        // ---------- STOCK SUMMARY ---------
         public Cursor getAllIngredients() {
             SQLiteDatabase db = this.getReadableDatabase();
             // Combine distinct ingredient names from both tables
@@ -516,6 +529,27 @@
                     "SELECT DISTINCT " + COLUMN_INGREDIENT + " FROM " + TABLE_STOCK_IN +
                             " UNION SELECT DISTINCT " + COLUMN_INGREDIENT + " FROM " + TABLE_STOCK_OUT,
                     null);
+        }
+
+        // ---------- TOTAL STOCK OUT ----------
+        public double getTotalStockOut(String ingredient) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery(
+                    "SELECT SUM(" + COLUMN_QUANTITY + ") FROM " + TABLE_STOCK_OUT +
+                            " WHERE " + COLUMN_INGREDIENT + "=?",
+                    new String[]{ingredient}
+            );
+            double total = 0;
+            if (c.moveToFirst()) total = c.getDouble(0);
+            c.close();
+            return total;
+        }
+
+        // ---------- REMAINING STOCK ----------
+        public double getRemainingStock(String ingredient) {
+            double inQty = getTotalStockIn(ingredient);
+            double outQty = getTotalStockOut(ingredient);
+            return inQty - outQty;
         }
 
 

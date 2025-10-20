@@ -6,8 +6,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F6FA"
     android:padding="16dp"
-    android:background="@color/white"
     tools:context=".Stocks">
 
     <!-- Title -->
@@ -15,39 +15,49 @@
         android:id="@+id/titleStocks"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Stocks"
+        android:text="📦 Stocks Summary"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="#222222"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
 
-    <!-- RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerStocks"
+    <!-- Card Container for ListView -->
+    <LinearLayout
+        android:id="@+id/cardContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@drawable/bg_card_white"
         app:layout_constraintTop_toBottomOf="@id/titleStocks"
         app:layout_constraintBottom_toTopOf="@id/buttonContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_stock"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Buttons -->
+        <!-- Stock List -->
+        <ListView
+            android:id="@+id/listStocks"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="8dp"
+            android:padding="8dp"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+    <!-- Buttons container -->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
-        android:background="@color/white"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -55,22 +65,26 @@
         <Button
             android:id="@+id/btnStockIn"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:text="Stock In"
+            android:textAllCaps="false"
+            android:textStyle="bold"
             android:textColor="@android:color/white"
             android:backgroundTint="#4CAF50"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_btn_stock_in"/>
 
         <Button
             android:id="@+id/btnStockOut"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="1"
-            android:backgroundTint="#F44336"
             android:text="Stock Out"
-            android:textColor="@android:color/white" />
-
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_btn_stock_out"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

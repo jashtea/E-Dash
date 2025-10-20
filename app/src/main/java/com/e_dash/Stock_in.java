@@ -36,6 +36,9 @@ public class Stock_in extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUnit.setAdapter(adapter);
 
+        // Set default selection to kg (index 0)
+        spinnerUnit.setSelection(0);
+
         // Date picker for stock-in date
         editStockInDate.setOnClickListener(v -> showDatePicker());
 
@@ -87,7 +90,8 @@ public class Stock_in extends AppCompatActivity {
             editIngredientName.setText("");
             editQuantityIn.setText("");
             editStockInDate.setText("");
-            spinnerUnit.setSelection(0);
+            // Keep last selected unit instead of resetting
+            // spinnerUnit.setSelection(0); // <-- removed
         } else {
             Toast.makeText(this, "Failed to save stock-in", Toast.LENGTH_SHORT).show();
         }
