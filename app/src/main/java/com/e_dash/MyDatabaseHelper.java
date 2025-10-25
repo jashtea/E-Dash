@@ -249,21 +249,30 @@
             SQLiteDatabase db = this.getReadableDatabase();
             String query;
 
-            if (filter.equals("This Month")) {
+            if (filter.equals("Today")) {
+                // 🔹 Show only records where the date is today's date
                 query = "SELECT product_name, SUM(sold) FROM sales " +
-                        "WHERE strftime('%Y-%m', date) = strftime('%Y-%m', 'now') " +
+                        "WHERE date(date) = date('now', 'localtime') " +
                         "GROUP BY product_name";
+
+            } else if (filter.equals("This Month")) {
+                query = "SELECT product_name, SUM(sold) FROM sales " +
+                        "WHERE strftime('%Y-%m', date) = strftime('%Y-%m', 'now', 'localtime') " +
+                        "GROUP BY product_name";
+
             } else if (filter.equals("This Week")) {
                 query = "SELECT product_name, SUM(sold) FROM sales " +
-                        "WHERE strftime('%W', date) = strftime('%W', 'now') " +
-                        "AND strftime('%Y', date) = strftime('%Y', 'now') " +
+                        "WHERE strftime('%W', date) = strftime('%W', 'now', 'localtime') " +
+                        "AND strftime('%Y', date) = strftime('%Y', 'now', 'localtime') " +
                         "GROUP BY product_name";
-            } else { // All Time
+
+            } else { // 🔹 All Time
                 query = "SELECT product_name, SUM(sold) FROM sales GROUP BY product_name";
             }
 
             return db.rawQuery(query, null);
         }
+
 
         //retrieve user detail
         public Cursor getUserDetails(String username) {
@@ -365,6 +374,7 @@
             SQLiteDatabase db = this.getWritableDatabase();
 
             Cursor dateCursor = db.rawQuery("SELECT DISTINCT date FROM sales", null);
+
             if (dateCursor.moveToFirst()) {
                 do {
                     String date = dateCursor.getString(dateCursor.getColumnIndexOrThrow("date"));
@@ -552,8 +562,24 @@
             return inQty - outQty;
         }
 
+        public Cursor getSalesByDate(String date) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            return db.rawQuery("SELECT * FROM sales WHERE date = ?", new String[]{date});
+        }
 
+        public boolean deleteSalesByDate(String date) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            int result = db.delete("sales", "date = ?", new String[]{date});
+            return result > 0;
+        }
 
+        public boolean updateQuantityValue(String productName, int newQuantity, String date) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("quantity", newQuantity);
+            int result = db.update("sales", values, "product_name=? AND date=?", new String[]{productName, date});
+            return result > 0;
+        }
 
 
 

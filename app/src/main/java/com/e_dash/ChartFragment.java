@@ -40,7 +40,8 @@ public class ChartFragment extends Fragment {
         Spinner filterSpinner = view.findViewById(R.id.filterSpinner);
 
         // Spinner options
-        String[] filters = {"All Time", "This Month", "This Week"};
+        String[] filters = {"This Year", "This Month", "This Week", "Today"};
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, filters);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterSpinner.setAdapter(adapter);
@@ -91,7 +92,7 @@ public class ChartFragment extends Fragment {
         // Sort descending by sales
         Collections.sort(allSales, (a, b) -> b.sold - a.sold);
 
-        int maxSlices = 6;
+        int maxSlices = 10;
         int othersTotal = 0;
 
         for (int i = 0; i < allSales.size(); i++) {
