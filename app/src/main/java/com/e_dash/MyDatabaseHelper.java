@@ -23,7 +23,7 @@
 
         // Database elements
         private static final String DATABASE_NAME = "Edash.db";
-        private static final int DATABASE_VERSION = 7;
+        private static final int DATABASE_VERSION = 18;
 
         // User table
         private static final String TABLE_NAME = "user";
@@ -127,9 +127,12 @@
                     STOCKS_COLUMN_UNIT + " TEXT, " +      // added unit column
                     STOCKS_COLUMN_DATE + " DATE DEFAULT (DATE('now')))");
 
-            //        insertSampleDailySales(db);
-
+//            insertMockSalesData(db);
+//            insertStockInByMonth(db);
+//            insertStockOutByMonth(db);
             android.util.Log.d("DatabaseHelper", "Database created successfully");
+
+
         }
 
         @Override
@@ -213,6 +216,7 @@
 
             return result != -1;
         }
+
 
 
         //Update sales
@@ -581,6 +585,148 @@
             return result > 0;
         }
 
+//        public void insertMockSalesData(SQLiteDatabase db) {
+//
+//            String[] products = {
+//                    "Pandesal","Hard Crush","Ensaymada","Monggo Roll","Choco German",
+//                    "Spanish Roll","Choco Cheese","Chickoy","Elorde","Pandelemon",
+//                    "Pandecoco","Buko Pie","Pandemora","Starbread","Chococup",
+//                    "Cheese Mamon","Torta Mamon","Sweetheart","Hawaiian","Halfmoon",
+//                    "Polvoron Cookies","Choco Crinkles","Pandecioso","Pineapple Pie","Pan de Roke"
+//            };
+//
+//            double[] prices = {
+//                    2,5,5,5,5,
+//                    5,5,5,5,5,
+//                    5,8,5,5,5,
+//                    5,10,5,5,5,
+//                    5,5,5,8,5
+//            };
+//
+//            Random random = new Random();
+//
+//            Calendar start = Calendar.getInstance();
+//            start.set(2025, Calendar.DECEMBER, 1);
+//
+//            Calendar end = Calendar.getInstance();
+//            end.set(2026, Calendar.FEBRUARY, 28);
+//
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+//
+//            db.beginTransaction(); // 🚀 super fast
+//
+//            try {
+//                while (!start.after(end)) {
+//
+//                    String date = sdf.format(start.getTime());
+//
+//                    for (int i = 0; i < products.length; i++) {
+//
+//                        int quantity = 600 + random.nextInt(300); // 600–900
+//                        int sold = 100 + random.nextInt(quantity - 100);
+//
+//                        db.execSQL("INSERT INTO sales (product_name, price, quantity, sold, date) VALUES (?, ?, ?, ?, ?)",
+//                                new Object[]{
+//                                        products[i],
+//                                        prices[i],
+//                                        quantity,
+//                                        sold,
+//                                        date
+//                                });
+//                    }
+//
+//                    start.add(Calendar.DAY_OF_MONTH, 1);
+//                }
+//
+//                db.setTransactionSuccessful();
+//            } finally {
+//                db.endTransaction();
+//            }
+//        }
+
+//        public void insertStockInByMonth(SQLiteDatabase db) {
+//
+//            String[] ingredients = {
+//                    "Harina", "Mantika", "Margarine", "Cheese",
+//                    "Peanut butter", "Coconut", "Sugar", "Oil",
+//                    "Egg", "Baking Powder", "Gatas", "Yeast"
+//            };
+//
+//            double[] quantities = {
+//                    10.0, 10.0, 20.0, 25.0,
+//                    30.0, 50.0, 15.0, 10.0,
+//                    120.0, 15.0, 20.0, 10.0
+//            };
+//
+//            String[] units = {
+//                    "kg", "liters", "pcs", "pcs",
+//                    "pcs", "pcs", "kg", "liters",
+//                    "pcs", "kg", "liters", "pcs"
+//            };
+//
+//            // Fixed dates per month (ALL ingredients share same date per month)
+//            String[] monthlyDates = {
+//                    "2025-12-15", // December 2025
+//                    "2026-01-15", // January 2026
+//                    "2026-02-15"  // February 2026
+//            };
+//
+//            for (String date : monthlyDates) {
+//
+//                for (int i = 0; i < ingredients.length; i++) {
+//
+//                    ContentValues cv = new ContentValues();
+//                    cv.put(COLUMN_INGREDIENT, ingredients[i]);
+//                    cv.put(STOCKS_COLUMN_QUANTITY, quantities[i]);
+//                    cv.put(STOCKS_COLUMN_UNIT, units[i]);
+//                    cv.put(STOCKS_COLUMN_DATE, date);
+//
+//                    db.insert(TABLE_STOCK_IN, null, cv);
+//                }
+//            }
+//        }
+
+//        public void insertStockOutByMonth(SQLiteDatabase db) {
+//
+//            String[] ingredients = {
+//                    "Harina", "Mantika", "Margarine", "Cheese",
+//                    "Peanut butter", "Coconut", "Sugar", "Oil",
+//                    "Egg", "Baking Powder", "Gatas", "Yeast"
+//            };
+//
+//            double[] quantities = {
+//                    2.0, 1.5, 3.0, 2.0,
+//                    1.0, 2.5, 4.0, 1.0,
+//                    10.0, 1.0, 2.0, 1.0
+//            };
+//
+//            String[] units = {
+//                    "kg", "liters", "pcs", "pcs",
+//                    "pcs", "pcs", "kg", "liters",
+//                    "pcs", "kg", "liters", "pcs"
+//            };
+//
+//            // Same monthly structure (Dec 2025 → Feb 2026)
+//            String[] monthlyDates = {
+//                    "2025-12-15",
+//                    "2026-01-15",
+//                    "2026-02-15"
+//            };
+//
+//            for (String date : monthlyDates) {
+//
+//                for (int i = 0; i < ingredients.length; i++) {
+//
+//                    ContentValues cv = new ContentValues();
+//                    cv.put(COLUMN_INGREDIENT, ingredients[i]);
+//                    cv.put(STOCKS_COLUMN_QUANTITY, quantities[i]);
+//                    cv.put(STOCKS_COLUMN_UNIT, units[i]);
+//                    cv.put(STOCKS_COLUMN_DATE, date);
+//
+//                    db.insert(TABLE_STOCK_OUT, null, cv);
+//                }
+//            }
+//        }
 
 
     }

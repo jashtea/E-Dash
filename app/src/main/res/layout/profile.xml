@@ -49,7 +49,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp" />
 
+
     <!-- Card for Username -->
+
+    <ImageView
+        android:id="@+id/csv"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/dl_file"
+        app:layout_constraintBottom_toTopOf="@+id/cardUsername"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.812"
+        app:layout_constraintStart_toEndOf="@+id/prof"
+        app:layout_constraintTop_toBottomOf="@+id/cover"
+        app:layout_constraintVertical_bias="0.207" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardUsername"
         android:layout_width="0dp"
@@ -73,6 +87,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:background="@color/white"/>
+
     </androidx.cardview.widget.CardView>
 
     <!-- Card for Email -->
@@ -122,22 +137,51 @@
         android:elevation="6dp"/>
 
     <!-- Logout Button -->
+
     <Button
         android:id="@+id/logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="40dp"
+        android:backgroundTint="@color/black"
+        android:elevation="6dp"
+        android:padding="12dp"
         android:text="Logout"
+        android:textColor="@android:color/white"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@android:color/white"
-        android:backgroundTint="@color/black"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/editProfile"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="6dp"/>
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editProfile" />
+
+    <Button
+        android:id="@+id/Practice"
+        android:layout_width="288dp"
+        android:layout_height="41dp"
+        android:text="Practice"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.901" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wellcome"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/Practice"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.12"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.468" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
