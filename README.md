@@ -1,4 +1,4 @@
-Ecommerce Analytics Dashboard (E-Dash)
+# Ecommerce Analytics Dashboard (E-Dash)
 
 - A mobile-based Ecommerce Analytics Dashboard designed to help small-medium businesses improve inventory management, monitor customer transactions, and make better decision making.
 
